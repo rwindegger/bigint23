@@ -3,7 +3,7 @@ from conan.tools.cmake import cmake_layout, CMakeToolchain, CMakeDeps, CMake
 
 class bigint23(ConanFile):
     name = "bigint23"
-    version = "1.0"
+    version = "2.1"
 
     license = "MIT"
     author = "Rene Windegger <rene@windegger.wtf>"
