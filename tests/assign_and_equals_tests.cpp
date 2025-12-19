@@ -161,7 +161,7 @@ namespace {
         uint128_t const t = "0x1234567890abcdef1234567890abcdef";
         uint256_t const u = "0x1234567890ABCDEF1234567890ABCDEF";
         ASSERT_EQ(u, t);
-        ASSERT_THROW(uint128_t const v = "0x1234567890abcdef1234567890abcdefabcdef", std::overflow_error);
+        ASSERT_THROW(std::ignore = uint128_t{"0x1234567890abcdef1234567890abcdefabcdef"}, std::overflow_error);
         uint128_t x = "0x1234";
         constexpr std::uint64_t y = 0x1234;
         ASSERT_EQ(y, x);
@@ -170,9 +170,9 @@ namespace {
         ASSERT_EQ(z, x);
         int128_t const aa = "-42";
         ASSERT_EQ(-42, aa);
-        ASSERT_THROW(uint128_t const ab = "-42", std::runtime_error);
-        ASSERT_THROW(uint128_t const ac = "0xG2", std::runtime_error);
-        ASSERT_THROW(uint128_t const ad = "081", std::runtime_error);
+        ASSERT_THROW(std::ignore = uint128_t{"-42"}, std::runtime_error);
+        ASSERT_THROW(std::ignore = uint128_t{"0xG2"}, std::runtime_error);
+        ASSERT_THROW(std::ignore = uint128_t{"081"}, std::runtime_error);
 
         int128_t const ae = std::string("-1234");
         ASSERT_EQ(ae, -1234);
@@ -184,7 +184,7 @@ namespace {
         ASSERT_EQ(ah, 0b10010101);
         uint128_t const ai = std::string("1234");
         ASSERT_EQ(ai, 1234);
-        ASSERT_THROW(uint128_t const aj = std::string("-1234"), std::runtime_error);
+        ASSERT_THROW(std::ignore = uint128_t{std::string("-1234")}, std::runtime_error);
         uint128_t ak = std::string("0b10010101");
         ASSERT_EQ(ak, 0b10010101);
         ak = std::string("1234");

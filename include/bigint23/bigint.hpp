@@ -618,7 +618,6 @@ namespace bigint {
                 throw std::overflow_error("Division by zero");
             }
 
-            auto quotient = bigint{};
             auto remainder = bigint{};
             static constexpr auto total_bits = std::to_underlying(bits);
 
@@ -937,11 +936,11 @@ namespace bigint {
                 }
                 std::uint8_t digit = 0;
                 if (c >= '0' and c <= '9') {
-                    digit = c - '0';
+                    digit = static_cast<std::uint8_t>(c - '0');
                 } else if (c >= 'a' and c <= 'f') {
-                    digit = 10 + (c - 'a');
+                    digit = static_cast<std::uint8_t>(10 + (c - 'a'));
                 } else if (c >= 'A' and c <= 'F') {
-                    digit = 10 + (c - 'A');
+                    digit = static_cast<std::uint8_t>(10 + (c - 'A'));
                 } else {
                     throw std::runtime_error("Invalid digit in input string.");
                 }
