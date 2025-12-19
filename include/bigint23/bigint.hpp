@@ -1098,7 +1098,7 @@ namespace bigint {
             os.put('-');
         }
 
-        auto const length = static_cast<std::size_t>(buffer.end() - pos);
+        auto const length = static_cast<std::streamsize>(buffer.end() - pos);
         os.write(std::to_address(pos), length);
         return os;
     }
