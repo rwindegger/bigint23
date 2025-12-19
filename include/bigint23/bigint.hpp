@@ -3,7 +3,6 @@
 //
 
 #pragma once
-#pragma warning(disable: 4244)
 
 #include <algorithm>
 #include <array>
@@ -440,7 +439,7 @@ namespace bigint {
                         };
                         product += static_cast<std::uint32_t>(result.data_[i + j]) + carry;
                         result.data_[i + j] = static_cast<std::uint8_t>(product & 0xFF);
-                        carry = product >> 8;
+                        carry = static_cast<uint16_t>(product >> 8);
                     }
                     if (i + m < n) {
                         auto const sum = std::uint32_t{static_cast<std::uint32_t>(result.data_[i + m]) + carry};
@@ -461,7 +460,7 @@ namespace bigint {
                         };
                         product += static_cast<std::uint32_t>(result.data_[result_idx]) + carry;
                         result.data_[result_idx] = static_cast<std::uint8_t>(product & 0xFF);
-                        carry = product >> 8;
+                        carry = static_cast<uint16_t>(product >> 8);
                     }
                     if (i + m < n) {
                         auto const result_idx = std::size_t{n - 1 - (i + m)};
