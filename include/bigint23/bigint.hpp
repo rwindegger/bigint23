@@ -439,7 +439,7 @@ namespace bigint {
                         };
                         product += static_cast<std::uint32_t>(result.data_[i + j]) + carry;
                         result.data_[i + j] = static_cast<std::uint8_t>(product & 0xFF);
-                        carry = product >> 8;
+                        carry = static_cast<std::uint16_t>(product >> 8);
                     }
                     if (i + m < n) {
                         auto const sum = std::uint32_t{static_cast<std::uint32_t>(result.data_[i + m]) + carry};
@@ -460,7 +460,7 @@ namespace bigint {
                         };
                         product += static_cast<std::uint32_t>(result.data_[result_idx]) + carry;
                         result.data_[result_idx] = static_cast<std::uint8_t>(product & 0xFF);
-                        carry = product >> 8;
+                        carry = static_cast<std::uint16_t>(product >> 8);
                     }
                     if (i + m < n) {
                         auto const result_idx = std::size_t{n - 1 - (i + m)};
@@ -618,7 +618,6 @@ namespace bigint {
                 throw std::overflow_error("Division by zero");
             }
 
-            auto quotient = bigint{};
             auto remainder = bigint{};
             static constexpr auto total_bits = std::to_underlying(bits);
 
@@ -937,11 +936,11 @@ namespace bigint {
                 }
                 std::uint8_t digit = 0;
                 if (c >= '0' and c <= '9') {
-                    digit = c - '0';
+                    digit = static_cast<std::uint8_t>(c - '0');
                 } else if (c >= 'a' and c <= 'f') {
-                    digit = 10 + (c - 'a');
+                    digit = static_cast<std::uint8_t>(10 + (c - 'a'));
                 } else if (c >= 'A' and c <= 'F') {
-                    digit = 10 + (c - 'A');
+                    digit = static_cast<std::uint8_t>(10 + (c - 'A'));
                 } else {
                     throw std::runtime_error("Invalid digit in input string.");
                 }
@@ -1062,7 +1061,7 @@ namespace bigint {
             temp /= std::int8_t{8};
         }
 
-        auto const length = static_cast<std::size_t>(buffer.end() - pos);
+        auto const length = static_cast<std::streamsize>(buffer.end() - pos);
         os.write(std::to_address(pos), length);
         return os;
     }
@@ -1099,7 +1098,7 @@ namespace bigint {
             os.put('-');
         }
 
-        auto const length = static_cast<std::size_t>(buffer.end() - pos);
+        auto const length = static_cast<std::streamsize>(buffer.end() - pos);
         os.write(std::to_address(pos), length);
         return os;
     }

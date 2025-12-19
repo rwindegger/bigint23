@@ -48,7 +48,6 @@ namespace {
         using i32 = bigint::bigint<bigint::BitWidth{32}, bigint::Signedness::Signed>;
         using u32 = bigint::bigint<bigint::BitWidth{32}, bigint::Signedness::Unsigned>;
         using i16 = bigint::bigint<bigint::BitWidth{16}, bigint::Signedness::Signed>;
-        using u16 = bigint::bigint<bigint::BitWidth{16}, bigint::Signedness::Unsigned>;
         u32 const a = 42;
         u32 const b = 43;
         ASSERT_EQ(a * b, 1806);
@@ -101,7 +100,7 @@ namespace {
         ASSERT_EQ(a / 2, 7);
         i32 const c = 15;
         ASSERT_EQ(c / -3, -5);
-        ASSERT_THROW(auto d = c / 0, std::overflow_error);
+        ASSERT_THROW(std::ignore = c / 0, std::overflow_error);
     }
 
     TEST(bigint23, division_with_bigint23_test) {
@@ -116,7 +115,7 @@ namespace {
         i32 const e = -3;
         ASSERT_EQ(d / e, -5);
         u32 const f = 0;
-        ASSERT_THROW(auto g = d / f, std::overflow_error);
+        ASSERT_THROW(std::ignore = d / f, std::overflow_error);
     }
 
     TEST(bigint23, modulo_with_integral_test) {
@@ -127,7 +126,7 @@ namespace {
         ASSERT_EQ(a % 2, 1);
         i32 const c = 15;
         ASSERT_EQ(c % -3, 0);
-        ASSERT_THROW(auto d = a % 0, std::overflow_error);
+        ASSERT_THROW(std::ignore = a % 0, std::overflow_error);
     }
 
     TEST(bigint23, modulo_with_bigint23_test) {
@@ -142,7 +141,7 @@ namespace {
         i32 const e = -3;
         ASSERT_EQ(d % e, 0);
         u32 const f = 0;
-        ASSERT_THROW(auto g = d % f, std::overflow_error);
+        ASSERT_THROW(std::ignore = d % f, std::overflow_error);
     }
 
     TEST(bigint23, shift_test) {
@@ -185,7 +184,7 @@ namespace {
         using i8 = bigint::bigint<bigint::BitWidth{8}, bigint::Signedness::Signed>;
         using u8 = bigint::bigint<bigint::BitWidth{8}, bigint::Signedness::Unsigned>;
         i8 const a = static_cast<int8_t>(0x80);
-        ASSERT_THROW(auto test = -a, std::overflow_error);
+        ASSERT_THROW(std::ignore = -a, std::overflow_error);
         i8 const b = static_cast<int8_t>(-15);
         ASSERT_EQ(static_cast<int8_t>(15), -b);
         i8 const c = static_cast<int8_t>(15);
