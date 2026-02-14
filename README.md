@@ -1,4 +1,7 @@
 # bigint
+[![codecov](https://codecov.io/gh/rwindegger/bigint23/graph/badge.svg?token=OAUF5OWOH2)](https://codecov.io/gh/rwindegger/bigint23)
+[![covdbg](https://covdbg.com/badge.svg/)](https://covdbg.com/)
+
 This header-only C++ library provides an arbitrary-fixed-width integer type called `bigint`. It supports both signed and unsigned numbers with a customizable bit-width. The class implements a wide range of arithmetic, bitwise, and comparison operators, making it suitable for tasks that require precise control over large integers.
 
 ## Features
