@@ -75,7 +75,7 @@ namespace bigint {
                     data_[i] = other.data_[i];
                 }
             } else {
-                for (auto const i: std::views::reverse(std::views::iota(1uz, other.data_.size() + 1))) {
+                for (auto const i: std::views::iota(0uz, other.data_.size())) {
                     data_[data_.size() - i - 1] = other.data_[other.data_.size() - i - 1];
                 }
             }
@@ -452,7 +452,7 @@ namespace bigint {
                         if (i + j >= n) {
                             break;
                         }
-                        auto const idx2 = std::size_t{m - 1 - j};
+                        auto const idx2 = std::size_t{n - 1 - j};
                         auto const result_idx = std::size_t{n - 1 - (i + j)};
                         auto product = std::uint32_t{
                             static_cast<std::uint32_t>(abs_this.data_[idx1]) *
@@ -664,12 +664,22 @@ namespace bigint {
                 }
             }
 
-            auto carry = std::uint16_t{0};
-            for (auto const i: std::views::iota(0uz, n)) {
-                auto const temp = static_cast<std::uint16_t>(
-                    (static_cast<std::uint16_t>(result[i]) << bit_shift) | carry);
-                result[i] = static_cast<std::uint8_t>(temp & 0xFF);
-                carry = temp >> 8;
+            if constexpr (std::endian::native == std::endian::little) {
+                auto carry = std::uint16_t{0};
+                for (auto const i: std::views::iota(0uz, n)) {
+                    auto const temp = static_cast<std::uint16_t>(
+                        (static_cast<std::uint16_t>(result[i]) << bit_shift) | carry);
+                    result[i] = static_cast<std::uint8_t>(temp & 0xFF);
+                    carry = temp >> 8;
+                }
+            } else {
+                auto carry = std::uint16_t{0};
+                for (auto const i: std::views::reverse(std::views::iota(0uz, n))) {
+                    auto const temp = static_cast<std::uint16_t>(
+                        (static_cast<std::uint16_t>(result[i]) << bit_shift) | carry);
+                    result[i] = static_cast<std::uint8_t>(temp & 0xFF);
+                    carry = temp >> 8;
+                }
             }
 
             data_ = result;
@@ -1009,12 +1019,12 @@ namespace bigint {
     template<BitWidth bits, Signedness signedness>
     constexpr std::ostream &print_hex(std::ostream &os, bigint<bits, signedness> const &data, bool const use_uppercase) {
         auto const &buf = data.data_;
-        auto start = buf.size();
-        while (start > 1 and buf[start - 1] == 0) {
-            --start;
-        }
 
         if constexpr (std::endian::native == std::endian::little) {
+            auto start = buf.size();
+            while (start > 1 and buf[start - 1] == 0) {
+                --start;
+            }
             for (auto const i: std::views::reverse(std::views::iota(0uz, start))) {
                 auto local = std::array<char, 3>{};
                 std::snprintf(
@@ -1026,7 +1036,11 @@ namespace bigint {
                 os.write(local.data(), local.size() - 1);
             }
         } else {
-            for (auto const i: std::views::iota(0uz, start)) {
+            auto start = 0uz;
+            while (start < buf.size() - 1 and buf[start] == 0) {
+                ++start;
+            }
+            for (auto const i: std::views::iota(start, buf.size())) {
                 auto local = std::array<char, 3>{};
                 std::snprintf(
                     local.data(),
@@ -1056,7 +1070,12 @@ namespace bigint {
 
         while (temp != std::int8_t{0}) {
             auto r = temp % std::int8_t{8};
-            auto digit = r.data_[0];
+            auto digit = std::uint8_t{0};
+            if constexpr (std::endian::native == std::endian::little) {
+                digit = r.data_[0];
+            } else {
+                digit = r.data_[r.data_.size() - 1];
+            }
             *--pos = static_cast<char>('0' + digit);
             temp /= std::int8_t{8};
         }
@@ -1089,7 +1108,12 @@ namespace bigint {
 
         while (temp != std::int8_t{0}) {
             auto r = temp % std::int8_t{10};
-            auto digit = r.data_[0];
+            auto digit = std::uint8_t{0};
+            if constexpr (std::endian::native == std::endian::little) {
+                digit = r.data_[0];
+            } else {
+                digit = r.data_[r.data_.size() - 1];
+            }
             *--pos = static_cast<char>('0' + digit);
             temp /= std::int8_t{10};
         }
