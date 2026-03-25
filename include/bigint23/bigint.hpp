@@ -452,7 +452,7 @@ namespace bigint {
                         if (i + j >= n) {
                             break;
                         }
-                        auto const idx2 = std::size_t{m - 1 - j};
+                        auto const idx2 = std::size_t{n - 1 - j};
                         auto const result_idx = std::size_t{n - 1 - (i + j)};
                         auto product = std::uint32_t{
                             static_cast<std::uint32_t>(abs_this.data_[idx1]) *
