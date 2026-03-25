@@ -1,0 +1,40 @@
+name: CMake on big-endian s390x
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cross toolchain and QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            qemu-user \
+            qemu-user-binfmt \
+            gcc-s390x-linux-gnu \
+            g++-s390x-linux-gnu \
+            libc6-dev-s390x-cross
+
+      - name: Configure CMake
+        run: |
+          cmake -S ${{ github.workspace }} -B ${{ github.workspace }}/build-s390x -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=s390x-linux-gnu-gcc \
+            -DCMAKE_CXX_COMPILER=s390x-linux-gnu-g++ \
+            -DCMAKE_CROSSCOMPILING_EMULATOR='qemu-s390x;-L;/usr/s390x-linux-gnu'
+
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/build-s390x
+
+      - name: Test
+        run: ctest --test-dir ${{ github.workspace }}/build-s390x --output-on-failure
