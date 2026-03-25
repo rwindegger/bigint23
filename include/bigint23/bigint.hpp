@@ -1019,12 +1019,12 @@ namespace bigint {
     template<BitWidth bits, Signedness signedness>
     constexpr std::ostream &print_hex(std::ostream &os, bigint<bits, signedness> const &data, bool const use_uppercase) {
         auto const &buf = data.data_;
-        auto start = buf.size();
-        while (start > 1 and buf[start - 1] == 0) {
-            --start;
-        }
 
         if constexpr (std::endian::native == std::endian::little) {
+            auto start = buf.size();
+            while (start > 1 and buf[start - 1] == 0) {
+                --start;
+            }
             for (auto const i: std::views::reverse(std::views::iota(0uz, start))) {
                 auto local = std::array<char, 3>{};
                 std::snprintf(
@@ -1036,7 +1036,11 @@ namespace bigint {
                 os.write(local.data(), local.size() - 1);
             }
         } else {
-            for (auto const i: std::views::iota(0uz, start)) {
+            auto start = 0uz;
+            while (start < buf.size() - 1 and buf[start] == 0) {
+                ++start;
+            }
+            for (auto const i: std::views::iota(start, buf.size())) {
                 auto local = std::array<char, 3>{};
                 std::snprintf(
                     local.data(),
@@ -1066,7 +1070,12 @@ namespace bigint {
 
         while (temp != std::int8_t{0}) {
             auto r = temp % std::int8_t{8};
-            auto digit = r.data_[0];
+            auto digit = std::uint8_t{0};
+            if constexpr (std::endian::native == std::endian::little) {
+                digit = r.data_[0];
+            } else {
+                digit = r.data_[r.data_.size() - 1];
+            }
             *--pos = static_cast<char>('0' + digit);
             temp /= std::int8_t{8};
         }
@@ -1099,7 +1108,12 @@ namespace bigint {
 
         while (temp != std::int8_t{0}) {
             auto r = temp % std::int8_t{10};
-            auto digit = r.data_[0];
+            auto digit = std::uint8_t{0};
+            if constexpr (std::endian::native == std::endian::little) {
+                digit = r.data_[0];
+            } else {
+                digit = r.data_[r.data_.size() - 1];
+            }
             *--pos = static_cast<char>('0' + digit);
             temp /= std::int8_t{10};
         }
