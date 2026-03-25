@@ -574,40 +574,18 @@ namespace bigint {
                 throw std::overflow_error("Division by zero");
             }
 
-            auto negative_result = false;
-            auto abs_this = bigint{*this};
-            auto abs_other = bigint{other};
-
-            if constexpr (signedness == Signedness::Signed) {
-                if (*this < std::int8_t{0}) {
-                    negative_result = !negative_result;
-                    abs_this = -*this;
-                }
-            }
-            if constexpr (other_signedness == Signedness::Signed) {
-                if (other < std::int8_t{0}) {
-                    negative_result = !negative_result;
-                    abs_other = -abs_other;
-                }
-            }
-
             auto quotient = bigint{};
             auto remainder = bigint{};
             static constexpr auto total_bits = std::to_underlying(bits);
 
             for (auto const i: std::views::reverse(std::views::iota(0uz, total_bits))) {
                 remainder <<= std::int8_t{1};
-                if (abs_this.get_bit(i)) {
+                if (this->get_bit(i)) {
                     remainder += std::int8_t{1};
                 }
-                if (remainder >= abs_other) {
-                    remainder -= abs_other;
+                if (remainder >= other) {
+                    remainder -= other;
                     quotient.set_bit(i, true);
-                }
-            }
-            if constexpr (signedness == Signedness::Signed) {
-                if (negative_result) {
-                    quotient = -quotient;
                 }
             }
             *this = quotient;
@@ -640,38 +618,17 @@ namespace bigint {
                 throw std::overflow_error("Division by zero");
             }
 
-            auto negative_result = false;
-            auto abs_this = bigint{*this};
-            auto abs_other = bigint{other};
-
-            if constexpr (signedness == Signedness::Signed) {
-                if (*this < std::int8_t{0}) {
-                    negative_result = true;
-                    abs_this = -*this;
-                }
-            }
-            if constexpr (other_signedness == Signedness::Signed) {
-                if (other < std::int8_t{0}) {
-                    abs_other = -abs_other;
-                }
-            }
-
             auto remainder = bigint{};
             static constexpr auto total_bits = std::to_underlying(bits);
 
             for (auto const i: std::views::reverse(std::views::iota(0uz, total_bits))) {
                 remainder <<= std::int8_t{1};
-                if (abs_this.get_bit(i)) {
+                if (this->get_bit(i)) {
                     remainder += std::int8_t{1};
                 }
 
-                if (remainder >= abs_other) {
-                    remainder -= abs_other;
-                }
-            }
-            if constexpr (signedness == Signedness::Signed) {
-                if (negative_result) {
-                    remainder = -remainder;
+                if (remainder >= other) {
+                    remainder -= other;
                 }
             }
             *this = remainder;
