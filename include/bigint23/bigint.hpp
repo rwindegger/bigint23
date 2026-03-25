@@ -75,7 +75,7 @@ namespace bigint {
                     data_[i] = other.data_[i];
                 }
             } else {
-                for (auto const i: std::views::reverse(std::views::iota(1uz, other.data_.size() + 1))) {
+                for (auto const i: std::views::iota(0uz, other.data_.size())) {
                     data_[data_.size() - i - 1] = other.data_[other.data_.size() - i - 1];
                 }
             }
