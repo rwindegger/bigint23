@@ -574,18 +574,40 @@ namespace bigint {
                 throw std::overflow_error("Division by zero");
             }
 
+            auto negative_result = false;
+            auto abs_this = bigint{*this};
+            auto abs_other = bigint{other};
+
+            if constexpr (signedness == Signedness::Signed) {
+                if (*this < std::int8_t{0}) {
+                    negative_result = !negative_result;
+                    abs_this = -*this;
+                }
+            }
+            if constexpr (other_signedness == Signedness::Signed) {
+                if (other < std::int8_t{0}) {
+                    negative_result = !negative_result;
+                    abs_other = -abs_other;
+                }
+            }
+
             auto quotient = bigint{};
             auto remainder = bigint{};
             static constexpr auto total_bits = std::to_underlying(bits);
 
             for (auto const i: std::views::reverse(std::views::iota(0uz, total_bits))) {
                 remainder <<= std::int8_t{1};
-                if (this->get_bit(i)) {
+                if (abs_this.get_bit(i)) {
                     remainder += std::int8_t{1};
                 }
-                if (remainder >= other) {
-                    remainder -= other;
+                if (remainder >= abs_other) {
+                    remainder -= abs_other;
                     quotient.set_bit(i, true);
+                }
+            }
+            if constexpr (signedness == Signedness::Signed) {
+                if (negative_result) {
+                    quotient = -quotient;
                 }
             }
             *this = quotient;
@@ -618,17 +640,38 @@ namespace bigint {
                 throw std::overflow_error("Division by zero");
             }
 
+            auto negative_result = false;
+            auto abs_this = bigint{*this};
+            auto abs_other = bigint{other};
+
+            if constexpr (signedness == Signedness::Signed) {
+                if (*this < std::int8_t{0}) {
+                    negative_result = true;
+                    abs_this = -*this;
+                }
+            }
+            if constexpr (other_signedness == Signedness::Signed) {
+                if (other < std::int8_t{0}) {
+                    abs_other = -abs_other;
+                }
+            }
+
             auto remainder = bigint{};
             static constexpr auto total_bits = std::to_underlying(bits);
 
             for (auto const i: std::views::reverse(std::views::iota(0uz, total_bits))) {
                 remainder <<= std::int8_t{1};
-                if (this->get_bit(i)) {
+                if (abs_this.get_bit(i)) {
                     remainder += std::int8_t{1};
                 }
 
-                if (remainder >= other) {
-                    remainder -= other;
+                if (remainder >= abs_other) {
+                    remainder -= abs_other;
+                }
+            }
+            if constexpr (signedness == Signedness::Signed) {
+                if (negative_result) {
+                    remainder = -remainder;
                 }
             }
             *this = remainder;
@@ -664,12 +707,22 @@ namespace bigint {
                 }
             }
 
-            auto carry = std::uint16_t{0};
-            for (auto const i: std::views::iota(0uz, n)) {
-                auto const temp = static_cast<std::uint16_t>(
-                    (static_cast<std::uint16_t>(result[i]) << bit_shift) | carry);
-                result[i] = static_cast<std::uint8_t>(temp & 0xFF);
-                carry = temp >> 8;
+            if constexpr (std::endian::native == std::endian::little) {
+                auto carry = std::uint16_t{0};
+                for (auto const i: std::views::iota(0uz, n)) {
+                    auto const temp = static_cast<std::uint16_t>(
+                        (static_cast<std::uint16_t>(result[i]) << bit_shift) | carry);
+                    result[i] = static_cast<std::uint8_t>(temp & 0xFF);
+                    carry = temp >> 8;
+                }
+            } else {
+                auto carry = std::uint16_t{0};
+                for (auto const i: std::views::reverse(std::views::iota(0uz, n))) {
+                    auto const temp = static_cast<std::uint16_t>(
+                        (static_cast<std::uint16_t>(result[i]) << bit_shift) | carry);
+                    result[i] = static_cast<std::uint8_t>(temp & 0xFF);
+                    carry = temp >> 8;
+                }
             }
 
             data_ = result;
