@@ -21,6 +21,13 @@ namespace {
         ASSERT_EQ(oss.str(), "123456789");
     }
 
+    TEST(bigint23, constexpr_from_empty_string_test) {
+        constexpr bigint::bigint<bigint::BitWidth{128}, bigint::Signedness::Signed> a("");
+        std::ostringstream oss;
+        oss << std::dec << a;
+        ASSERT_EQ(oss.str(), "0");
+    }
+
     TEST(bigint23, constexpr_addition_test) {
         constexpr bigint::bigint<bigint::BitWidth{128}, bigint::Signedness::Signed> a(21);
         constexpr bigint::bigint<bigint::BitWidth{128}, bigint::Signedness::Signed> b(21);

@@ -106,7 +106,7 @@ namespace bigint {
                         break;
                 }
             } else {
-                if (str[0] == '-') {
+                if (str.length() > 1 and str[0] == '-') {
                     if constexpr (signedness == Signedness::Unsigned) {
                         throw std::runtime_error("Cannot initialize an unsigned bigint23 with a negative value.");
                     } else {
